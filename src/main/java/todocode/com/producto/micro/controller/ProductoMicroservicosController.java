@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import todocode.com.producto.micro.component.CustomeHealthIndicator;
 import todocode.com.producto.micro.dto.DTONombreProducto;
 import todocode.com.producto.micro.model.ProductoMicro;
 import todocode.com.producto.micro.servicies.ProductoServicioMicroServicios;
@@ -24,6 +26,9 @@ public class ProductoMicroservicosController {
 	
 	@Autowired
 	private ProductoServicioMicroServicios proServ;
+
+	@Autowired
+	private CustomeHealthIndicator healthEndpoint;
 
 	@Value("${server.port}")
 	private int serverPort;
@@ -90,6 +95,13 @@ public class ProductoMicroservicosController {
 	
 		return proServ.getNombreProducto(productos_id);
 		
+	}
+
+	@GetMapping("/custom-health")
+	public Health customHealth() {
+		Health health = healthEndpoint.health();
+		// Personalizar la respuesta de verificación de salud
+		return Health.status(health.getStatus()).withDetail("Custom", "Customized Health Check").build();
 	}
 	
 	
